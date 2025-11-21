@@ -4,6 +4,7 @@
    <meta charset"UTF-8">
    <meta name ="viewport"
    content="width=device-widh,initial-scale=1.0">
+   <link rel="shartcut icon" href="exercicios006/chrome.ico" type ="image/x-icon"> 
    <tiltle>Formatações de Textos</tiltle>
 </head>
   <h1> Principais Formataçõs </h1>
@@ -24,9 +25,9 @@
   <p> Podemos marcar <ins> um texto inserido </ins> para dar ênfase e indicar que ele foi adicionado depois. (INS) </P> 
   <p> Existe também a tag U <u> texto sublinhado </u>
   <h2> Texto Sobrescrito </h2> 
-  <p> Para inserir coisa do tipo x <sup>20</sup>+3</p>
+  <p> Para inserir coisa do tipo x <sup>20</sup>+3</p>(CIMA)
   <h2> Texto Subescritos</h2> 
-  <p> Para inserir coisa do tipo H<sub>2</sub>O</p> 
+  <p> Para inserir coisa do tipo H<sub>2</sub>O</p>(BAIXO)
 <body>   
 </body>
 </html> 
