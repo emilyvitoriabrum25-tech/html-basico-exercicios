@@ -1,0 +1,28 @@
+<!DOCTYPE html> 
+<html lang="pt-bt"
+  <head> 
+    <meta charset ="UTF-8">
+	<meta name ="viewport"
+	content="width-device-widh,initial-scale= 1.0">
+    <link rel="shortcut icon"
+	href="favi.ico" type="image/x-icon"> 	
+	<tiltle> Hierarquia de Títulos </tiltle>
+</head> 
+<body>
+  <h1> Entendendo Potugal </h1> 
+  <h2> Introdução </h2> 
+  <h3> Justificação da Tematica</h3> 
+  <p> Na conteporânia socieade Brasileira, os jovens tende a usar muito mais as redes sociais do que nos séculos passados,
+   visto que, muitos não conseguem "viver" sem o uso do celular. O grande risco é que o uso em excesso vem acompanhado de diversos problemas, entre eles estão:
+   <li> Ansiedade</li> 
+   <li> Depressão</li>
+   <li> Baixa-autoestima</li>
+   <li> Isolamento </li>
+   <li> Timidez. </li>
+  <h3> Caractér execional </h3> 
+  <h3> Perguntas de partida</h3> 
+  <h3> Metedologia de investigação</h3> 
+  <h2> Ordenamento de Terrritorio em Potugal</h2> 
+  <h3> Os instrumentos de gestão</h3>        
+</body> 
+</html>

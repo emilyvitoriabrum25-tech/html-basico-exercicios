@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+ <head> 
+  <meta charset="UTF-8">
+  <meta name="viewport"
+  content="width=device-widh,initial-scale=1.0"> 
+  <title>Trabalhando com links</title>
+</head> 
+   <h1> Usando links externos </h1> 
+   <p> Você pode acessar meu <a href="https://gustavoguanabara.github.io/" target="_blank" rel="external"> repositório público no GitHub</a> </p>
+   <h2> Links Internos </h2> 
+   <p> Está é a segunda página do site. Voltar para a primeira página. 
+<body> 
+</body>
+</html> 
