@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="icon" href="midia/favicon.ico" type="image/x-icon"> 
+  <title>Desafios do Gerente — Jogo + Manual</title>
+  <style>
+    :root{
+      --bg:#1b0b1a;
+      --accent:#ffcc00;
+      --panel:#2f002b;
+      --card:#550033;
+      --cell:#660044;
+      --muted:#bfa5c0;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:linear-gradient(180deg,var(--bg),#120412);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    header{
+      padding:18px;
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid rgba(255,204,0,0.06);
+    }
+    h1{margin:0;font-size:20px;color:var(--accent)}
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .controls select, .controls button, .controls input{
+      background:var(--panel);
+      color:#fff;
+      border:1px solid rgba(255,255,255,0.04);
+      padding:8px 10px;
+      border-radius:8px;
+    }
+    .wrap{
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:18px;
+      padding:18px;
+    }
+
+    /* Left panel (game + status) */
+    .left{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:14px;
+      min-height:640px;
+    }
+
+    /* Board area */
+    #board {
+      display:grid;
+      grid-template-columns: repeat(6, 56px);
+      grid-auto-rows: 56px;
+      gap:8px;
+      justify-content:center;
+      padding:12px;
+      background:linear-gradient(180deg,#27041a,#1b0011);
+      border-radius:10px;
+      border:1px solid rgba(255,204,0,0.06);
+    }
+    .cell{
+      width:56px;height:56px;
+      background:var(--cell);
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      border:2px solid var(--accent);
+      position:relative;
+      color:#fff;
+      font-size:12px;
+      transition:transform .25s;
+    }
+    .cell.zone-estrategico{box-shadow:0 0 0 3px rgba(255,204,0,0.03) inset}
+    .cell.zone-tatico{box-shadow:0 0 0 3px rgba(0,200,150,0.03) inset}
+    .cell.zone-operacional{box-shadow:0 0 0 3px rgba(0,120,255,0.03) inset}
+
+    /* Highlight animation */
+    .cell.highlight{
+      animation:pop .6s ease;
+      transform:translateY(-6px);
+      box-shadow:0 10px 24px rgba(0,0,0,0.6), 0 0 0 6px rgba(255,204,0,0.08);
+    }
+    @keyframes pop{
+      0%{transform:scale(0.95)}
+      60%{transform:scale(1.08)}
+      100%{transform:scale(1)}
+    }
+
+    /* Player tokens */
+    .token{
+      width:20px;height:20px;border-radius:50%;
+      position:absolute;bottom:4px;right:4px;
+      border:2px solid #fff;
+      transform:translate(0,0);
+      transition:transform .4s cubic-bezier(.2,.9,.3,1);
+    }
+
+    /* Right panel (manual + logs + scoreboard) */
+    .right{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:14px;
+      min-height:640px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .panel{
+      background:var(--panel);
+      border-radius:10px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .row{display:flex;gap:10px;align-items:center}
+    .scoreboard .player-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .badge{width:14px;height:14px;border-radius:50%;display:inline-block;margin-right:6px}
+
+    /* Card box */
+    #cardBox{
+      background:var(--card);
+      min-height:78px;
+      border-radius:8px;
+      padding:10px;
+      font-size:15px;
+      opacity:0;
+      transform:translateY(8px);
+      transition:opacity .5s, transform .5s;
+    }
+    #cardBox.show{opacity:1;transform:translateY(0)}
+
+    /* log */
+    #log{height:100px;overflow:auto;font-size:13px;color:var(--muted);padding:6px;background:rgba(0,0,0,0.08);border-radius:6px}
+
+    /* footer actions */
+    .actions{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .big-btn{background:var(--accent);color:#1b0011;font-weight:700;border-radius:8px;padding:10px 12px;border:none;cursor:pointer}
+
+    /* mobile */
+    @media (max-width:900px){
+      .wrap{grid-template-columns: 1fr; padding:12px}
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Desafios do Gerente — Jogo Oficial</h1>
+    <div class="controls">
+      <label style="font-size:13px;color:var(--muted)">Jogadores:</label>
+      <select id="numPlayers">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+
+      <label style="font-size:13px;color:var(--muted)">Peões:</label>
+      <select id="preset">
+        <option value="default">Gerentes (padrão)</option>
+        <option value="colors">Cores</option>
+      </select>
+
+      <button id="setupBtn">Iniciar / Reiniciar</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="left panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Tabuleiro (30 casas)</strong>
+        <div style="font-size:13px;color:var(--muted)">Zonas: Estratégico 1–5 • Tático 6–23 • Operacional 24–30</div>
+      </div>
+
+      <div id="board" aria-hidden="false"></div>
+
+      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+        <div>
+          <div style="font-size:13px;color:var(--muted)">Turno</div>
+          <div id="turnIndicator" style="font-weight:700">—</div>
+        </div>
+
+        <div>
+          <div style="font-size:13px;color:var(--muted)">Posição atual</div>
+          <div id="posIndicator" style="font-weight:700">1</div>
+        </div>
+
+        <div style="margin-left:auto">
+          <button class="big-btn" id="rollBtn">🎲 Jogar Dado</button>
+        </div>
+      </div>
+
+      <div id="cardBox" class="">Puxe uma carta ao cair em uma casa especial.</div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <strong>Manual rápido</strong>
+        <p style="margin:8px 0 0 0;font-size:14px;color:var(--muted)">
+          Este jogo simula o nível tático organizacional. Os jogadores são gerentes e conduzem um trimestre,
+          equilibrando metas, equipe, recursos e solução de problemas. Regras, componentes e cartas seguem o PDF. :contentReference[oaicite:1]{index=1}
+        </p>
+      </div>
+
+      <div class="panel">
+        <strong>Componentes</strong>
+        <div style="margin-top:8px;font-size:14px;color:var(--muted)">
+          1 tabuleiro (30 casas) • Peças: Gerente Marketing, Produção, RH, Financeiro • Cartas: P (Planejamento), R (Recursos),
+          E (Equipe), X (Problema), M (Meta) • Um dado.
+        </div>
+      </div>
+
+      <div class="panel scoreboard">
+        <strong>Placar</strong>
+        <div id="playersList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="panel">
+        <strong>Regras principais</strong>
+        <ol style="margin-top:8px;color:var(--muted);font-size:14px">
+          <li>Cada jogador lança o dado e avança pelo tabuleiro.</li>
+          <li>Ao cair em casa com símbolo, puxa e executa a carta correspondente (ação imediata).</li>
+          <li>Pontuação: Meta +2 pontos, Resolver problema +1, Perda de rodada -1.</li>
+          <li>Fim: quando todos alcançam a casa 30 — vence quem tiver maior pontuação.</li>
+        </ol>
+      </div>
+
+      <div class="panel">
+        <strong>Log de jogo</strong>
+        <div id="log"></div>
+        <div class="actions">
+          <button id="showRules" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px;border-radius:8px">Mostrar Regras Completas</button>
+          <button id="exportBtn" style="margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px;border-radius:8px">Exportar Resultado (JSON)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal-like rules full (simple) -->
+  <div id="fullRules" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6)">
+    <div style="width:90%;max-width:760px;background:#200018;border-radius:10px;padding:18px;border:2px solid rgba(255,204,0,0.06);">
+      <h2 style="margin:0 0 6px 0;color:var(--accent)">Regras completas</h2>
+      <div style="color:var(--muted);max-height:60vh;overflow:auto;padding-right:6px">
+        <p><strong>Objetivo:</strong> concluir o ciclo tático com a maior pontuação, equilibrando metas, equipe, recursos e solução de problemas.</p>
+        <p><strong>Zonas do tabuleiro:</strong> Estratégico (1–5), Tático (6–23), Operacional (24–30).</p>
+        <p><strong>Cartas de Ação:</strong></p>
+        <ul>
+          <li><strong>P — Planejamento:</strong> Reorganize o cronograma. Avance 1 casa. / Redefina prioridades. Ganhe 1 ponto.</li>
+          <li><strong>R — Recursos:</strong> Corte de orçamento! Volte 2 casas. / Verba extra liberada! Avance 2 casas.</li>
+          <li><strong>E — Equipe:</strong> Equipe sobrecarregada. Perca 1 rodada. / Nova contratação! Ganhe 1 ponto.</li>
+          <li><strong>X — Problema:</strong> Falha no sistema! Volte 1 casa. / Conflito interno! Perca 1 ponto.</li>
+          <li><strong>M — Meta:</strong> Meta batida! Ganhe 2 pontos. / Entrega parcial concluída. Avance 1 casa.</li>
+        </ul>
+        <p><strong>Pontuação:</strong> Meta +2 / Resolver problema +1 / Perda de rodada -1.</p>
+        <p><strong>Fim do jogo:</strong> termina quando todos chegam à casa 30. Vence quem tiver maior pontuação.</p>
+        <p style="color:var(--muted);font-size:13px">Fonte: PDF do jogo (cartas, regras e componentes). :contentReference[oaicite:2]{index=2}</p>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px">
+        <button id="closeRules" style="padding:8px 12px;border-radius:8px;background:var(--accent);color:#120012;border:none">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+  Implementação do jogo:
+  - Até 4 jogadores
+  - Cartas e comportamentos conforme PDF
+  - Sistema de pontos e perda de rodada
+  - Fim quando todos alcançam a casa 30
+  - Logs e exportação JSON
+*/
+
+const BOARD_SIZE = 30;
+const zones = (i) => (i<=5?'estrategico':(i<=23?'tatico':'operacional'));
+
+// cartas conforme PDF (mantive exatamente as strings)
+const cards = {
+  P: ["Reorganize o cronograma. Avance 1 casa.", "Redefina prioridades. Ganhe 1 ponto."],
+  R: ["Corte de orçamento! Volte 2 casas.", "Verba extra liberada! Avance 2 casas."],
+  E: ["Equipe sobrecarregada. Perca 1 rodada.", "Nova contratação! Ganhe 1 ponto."],
+  X: ["Falha no sistema! Volte 1 casa.", "Conflito interno! Perca 1 ponto."],
+  M: ["Meta batida! Ganhe 2 pontos.", "Entrega parcial concluída. Avance 1 casa."]
+};
+
+// mapa de casas - conforme exemplo do seu jogo original (símbolos nas casas)
+const map = {
+  3: "P", 5: "R", 7: "E", 9: "X", 11: "M",
+  13: "P", 15: "R", 17: "E", 19: "X", 21: "M",
+  23: "P", 25: "R", 27: "X", 29: "M"
+};
+
+// cores / presets para peões
+const defaultPlayers = [
+  {name:'Gerente Marketing', color:'#ff6b6b'},
+  {name:'Gerente Produção', color:'#6bd1ff'},
+  {name:'Gerente RH', color:'#ffd36b'},
+  {name:'Gerente Financeiro', color:'#9b6bff'}
+];
+
+let state = {
+  players: [],
+  currentTurn: 0, // index
+  started: false,
+  log: [],
+};
+
+// UTIL: cria o tabuleiro visual
+function drawBoard(){
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  for(let i=1;i<=BOARD_SIZE;i++){
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    if(i<=5) cell.classList.add('zone-estrategico');
+    else if(i<=23) cell.classList.add('zone-tatico');
+    else cell.classList.add('zone-operacional');
+
+    cell.id = 'cell-'+i;
+    cell.textContent = map[i] ? map[i] : i;
+    board.appendChild(cell);
+  }
+}
+drawBoard();
+
+// CONFIGURAÇÃO / INICIO
+document.getElementById('setupBtn').addEventListener('click',setupGame);
+document.getElementById('rollBtn').addEventListener('click',rollDice);
+document.getElementById('showRules').addEventListener('click', ()=>document.getElementById('fullRules').style.display='flex');
+document.getElementById('closeRules').addEventListener('click', ()=>document.getElementById('fullRules').style.display='none');
+document.getElementById('exportBtn').addEventListener('click', exportJSON);
+
+function log(msg){
+  const t = new Date().toLocaleTimeString();
+  state.log.unshift(`[${t}] ${msg}`);
+  const logEl = document.getElementById('log');
+  logEl.innerHTML = state.log.slice(0,200).map(x=>'<div>'+x+'</div>').join('');
+}
+
+// Cria elementos players list e tokens
+function renderPlayers(){
+  const list = document.getElementById('playersList');
+  list.innerHTML = '';
+  state.players.forEach((p,idx)=>{
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.style.background = p.color;
+    row.appendChild(badge);
+
+    const name = document.createElement('div');
+    name.innerHTML = `<div style="font-weight:700">${p.name}</div><div style="font-size:12px;color:var(--muted)">Pos: ${p.pos} • Pontos: ${p.points} ${p.skip? '• (Perde próximo turno)': ''}</div>`;
+    row.appendChild(name);
+
+    if(p.finished){
+      const fin = document.createElement('div');
+      fin.style.marginLeft='auto';
+      fin.style.fontSize='13px';
+      fin.style.color='var(--muted)';
+      fin.textContent = 'Finalizou';
+      row.appendChild(fin);
+    }
+
+    list.appendChild(row);
+  });
+}
+
+// Inicializa players e estado
+function setupGame(){
+  const n = parseInt(document.getElementById('numPlayers').value,10);
+  const preset = document.getElementById('preset').value;
+  state.players = [];
+  for(let i=0;i<n;i++){
+    const base = defaultPlayers[i] || {name:'Jogador '+(i+1), color:randomColor()};
+    state.players.push({
+      id:i,
+      name: base.name,
+      color: base.color,
+      pos: 1,
+      points: 0,
+      skip: false,
+      finished: false
+    });
+  }
+  state.currentTurn = 0;
+  state.started = true;
+  state.log = [];
+  drawBoard();
+  // add tokens to board
+  updateTokens();
+  updateIndicators();
+  renderPlayers();
+  log('Jogo iniciado com ' + n + ' jogador(es).');
+}
+
+// Atualiza tokens visuais no tabuleiro
+function updateTokens(){
+  // remove tokens
+  document.querySelectorAll('.token').forEach(t=>t.remove());
+  state.players.forEach((p,idx)=>{
+    const cell = document.getElementById('cell-'+p.pos);
+    if(!cell) return;
+    const token = document.createElement('div');
+    token.className = 'token';
+    token.style.background = p.color;
+    token.style.right = (4 + (idx*22))+'px';
+    token.title = p.name;
+    token.dataset.player = idx;
+    cell.appendChild(token);
+  });
+}
+
+// Lógica do dado
+function rollDice(){
+  if(!state.started){ alert('Clique em "Iniciar / Reiniciar" antes de jogar.'); return; }
+  // check if all finished
+  if(state.players.every(p=>p.finished)){
+    alert('Todos os jogadores já finalizaram — reinicie para jogar novamente.');
+    return;
+  }
+
+  const p = state.players[state.currentTurn];
+  // if player already finished, skip to next
+  if(p.finished){
+    advanceTurn();
+    return;
+  }
+  // if player must skip a turn
+  if(p.skip){
+    p.skip = false;
+    log(`${p.name} perdeu a rodada e recupera agora (skip limpa).`);
+    advanceTurn();
+    renderPlayers();
+    return;
+  }
+
+  // roll animation small visual
+  const roll = Math.floor(Math.random()*6) + 1;
+  log(`${p.name} lançou o dado: ${roll}`);
+  movePlayer(p, roll);
+}
+
+// Move com animação e aplica efeitos das cartas
+function movePlayer(player, steps){
+  // remove highlight anterior
+  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight'));
+  const start = player.pos;
+  let target = Math.min(BOARD_SIZE, start + steps);
+  player.pos = target;
+  animateTokenTo(player, target);
+
+  // show indicators
+  updateIndicators();
+  updateTokens();
+
+  // highlight cell landed
+  const landedCell = document.getElementById('cell-'+target);
+  if(landedCell){
+    landedCell.classList.add('highlight');
+  }
+
+  // check map for symbol
+  setTimeout(()=>{
+    if(map[target]){
+      const type = map[target];
+      const options = cards[type];
+      const result = options[Math.floor(Math.random()*options.length)];
+      showCard(type, result, player);
+      applyCardEffect(type, result, player);
+    } else {
+      showCard(null, 'Casa comum. Continue jogando.', player);
+    }
+    // check if reached 30
+    if(player.pos >= BOARD_SIZE){
+      if(!player.finished){
+        player.finished = true;
+        log(`${player.name} alcançou a casa 30!`);
+      }
+    }
+    // After actions, advance turn
+    renderPlayers();
+    updateTokens();
+    checkGameEnd();
+    advanceTurn();
+  }, 420); // espera animação do token
+}
+
+// anima token: apenas reposiciona (visualmente já está no cell DOM) — usamos uma pequena vibração
+function animateTokenTo(player, target){
+  // simple animation effect: pulse the cell
+  const cell = document.getElementById('cell-'+target);
+  if(!cell) return;
+  cell.classList.add('highlight');
+  setTimeout(()=>cell.classList.remove('highlight'),700);
+}
+
+// mostra carta com animação
+function showCard(type, text, player){
+  const box = document.getElementById('cardBox');
+  if(type) box.innerHTML = `<strong>Carta ${type}</strong>: ${text}`;
+  else box.innerHTML = text;
+  box.classList.add('show');
+  setTimeout(()=>box.classList.remove('show'), 2200);
+  log(`${player.name} -> ${type? 'Carta '+type : 'Casa comum'}: ${text}`);
+}
+
+// aplica efeitos das cartas textuais usando parsing simples (suficiente para as frases do PDF)
+function applyCardEffect(type, text, player){
+  // interpreta ações
+  // Avance N casas
+  const avanceMatch = text.match(/Avance (\d+) casa/);
+  if(avanceMatch){
+    const n = parseInt(avanceMatch[1],10);
+    player.pos = Math.min(BOARD_SIZE, player.pos + n);
+    log(`${player.name} avança ${n} casa(s). Nova posição: ${player.pos}`);
+    if(player.pos>=BOARD_SIZE){ player.finished=true; log(`${player.name} finalizou ao avançar!`); }
+  }
+  // Avance N casas (plural)
+  const avanceMatch2 = text.match(/Avance (\d+) casas/);
+  if(avanceMatch2){
+    const n = parseInt(avanceMatch2[1],10);
+    player.pos = Math.min(BOARD_SIZE, player.pos + n);
+    log(`${player.name} avança ${n} casas. Nova posição: ${player.pos}`);
+    if(player.pos>=BOARD_SIZE){ player.finished=true; log(`${player.name} finalizou ao avançar!`); }
+  }
+  // Volte N casas
+  const volteMatch = text.match(/Volte (\d+) casas?/);
+  if(volteMatch){
+    const n = parseInt(volteMatch[1],10);
+    player.pos = Math.max(1, player.pos - n);
+    log(`${player.name} volta ${n} casa(s). Nova posição: ${player.pos}`);
+  }
+  // Ganhe N pontos
+  const gainMatch = text.match(/Ganhe (\d+) ponto/);
+  if(gainMatch){
+    const n = parseInt(gainMatch[1],10);
+    player.points += n;
+    log(`${player.name} ganha ${n} ponto(s). Pontos: ${player.points}`);
+  }
+  // Ganhe N pontos plural
+  const gainMatch2 = text.match(/Ganhe (\d+) pontos/);
+  if(gainMatch2){
+    const n = parseInt(gainMatch2[1],10);
+    player.points += n;
+    log(`${player.name} ganha ${n} ponto(s). Pontos: ${player.points}`);
+  }
+  // Perca N ponto(s)
+  const losePoint = text.match(/Perca (\d+) ponto/);
+  if(losePoint){
+    const n = parseInt(losePoint[1],10);
+    player.points -= n;
+    log(`${player.name} perde ${n} ponto(s). Pontos: ${player.points}`);
+  }
+  // Perca 1 rodada
+  if(text.includes('Perca 1 rodada') || text.includes('perda de rodada') || text.includes('Perca 1 rodada.')){
+    player.skip = true;
+    // -1 point in rules also applied in X example sometimes; handled above if present
+    log(`${player.name} perde o próximo turno.`);
+  }
+
+  // Regras adicionais do PDF: pontuação por resolver problema +1 (aplicamos se cair em X e escolha for 'Falha no sistema' -> volta 1, então para "resolver problema" não há escolha automática)
+  // Para simplificar: se carta contém 'Falha no sistema' ou 'Conflito interno' trata-se de problema (X) — saiba que resolver problemas pode ser interpretado como ganhar +1, 
+  // mas neste jogo a ação é negativa; o PDF define "Resolver problema: +1" como pontuação possível ao resolver, 
+  // implementamos uma regra simples: se jogador cair em X e depois de ação tiver pos menor que antes (ou sofreu ponto negativo), não auto-concede +1.
+  // Mantemos estrita aplicação textual acima.
+
+  // Aplica limites: pontos não ficam negativos? Permitimos negativos porque o PDF não impede.
+  renderPlayers();
+}
+
+// Avança o indicador de turno para o próximo jogador ativo (que não finalizou)
+function advanceTurn(){
+  // find next player that isn't finished (or allow finished but skip them)
+  let next = state.currentTurn;
+  const n = state.players.length;
+  for(let i=1;i<=n;i++){
+    const cand = (state.currentTurn + i) % n;
+    if(!state.players[cand].finished){
+      state.currentTurn = cand;
+      updateIndicators();
+      return;
+    }
+  }
+  // se todos finalizados, mantemos o valor
+  updateIndicators();
+}
+
+// Atualiza indicadores visuais
+function updateIndicators(){
+  const cur = state.players[state.currentTurn];
+  document.getElementById('turnIndicator').textContent = cur ? cur.name : '—';
+  const pos = cur ? cur.pos : 1;
+  document.getElementById('posIndicator').textContent = pos;
+  renderPlayers();
+}
+
+// Checa fim do jogo
+function checkGameEnd(){
+  if(state.players.length===0) return;
+  if(state.players.every(p=>p.finished)){
+    // determina vencedor por pontos (maior pontuação). Em caso empate, lista-los.
+    const max = Math.max(...state.players.map(p=>p.points));
+    const winners = state.players.filter(p=>p.points===max);
+    if(winners.length===1){
+      log(`Jogo finalizado! Vencedor: ${winners[0].name} com ${winners[0].points} ponto(s).`);
+      alert(`Fim de jogo! Vencedor: ${winners[0].name} (${winners[0].points} pontos).`);
+    } else {
+      const names = winners.map(w=>w.name).join(', ');
+      log(`Jogo finalizado! Empate entre: ${names} com ${max} ponto(s).`);
+      alert(`Fim de jogo! Empate entre: ${names} (${max} pontos).`);
+    }
+  }
+}
+
+// Exporta estado em JSON (resultado)
+function exportJSON(){
+  const data = {
+    players: state.players.map(p=>({name:p.name,points:p.points,pos:p.pos,finished:p.finished})),
+    log: state.log,
+    date: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'resultado_desafios_do_gerente.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  log('Exportado resultado (JSON).');
+}
+
+// Utilitários
+function randomColor(){ return '#'+Math.floor(Math.random()*16777215).toString(16); }
+
+// Inicializa com 2 jogadores por padrão
+setupGame();
+
+</script>
+</body>
+</html>

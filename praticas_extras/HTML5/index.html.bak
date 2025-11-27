@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name ="viewport"
+content="didthdevice-width,initial-scale=1.0"
+  <title> GALERIA DE PROJETOS </title>
+</head>
+<body>
+    <h1> GALERIA DE PROJETOS HP</h1>
+	<br>
+	 <p> Veja abaixo a imagem do filme que vou assistir no sábado, dia 15 de nov. <br> Clique na imagem para ver detalhes;</p> 
+	 <h3> HARRY POTTER E O CALICE DE FOGO, 20 ANOS DE LANÇAMENTO!!!</h3> 
+	 <img src="imagens-praticas.html/logo_hp.png" alt "Logo Calice de Fogo" width="300" >
+	 <br>
+	  <p> Meu filme favorito é esse:</p> 
+	 <h3> PRISIONEEIRO DE ASKABAN! </h3> 
+	 <img src="imagens-praticas.html/logo_askaban.png" alt "Logo Askaban" width="300">  
+</body>
+</html>    
