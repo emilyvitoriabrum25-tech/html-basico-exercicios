@@ -5,27 +5,10 @@
   <meta name="viewport"
   content="width=device-widh,initial-scale=1.0"> 
   <title> Estilo Interno/Local </title>
-   <style>
-    body {   
-	background-color : black; 
-	font-family: Arial, Helvetica, sans-serif;
-	font-size : 20px; 
-	}
-	h1 { 
-	 color: darkblue;
-	 background-color: ligthblue;
-	 }
-	h2 {
-     color: darkred;
-	}
-    p {
-     text-align : justify; 
-	}
-  </style> 	
 </head>  
-<body > 
+<body> 
  <h1> Capitulo 1 </h1> 
-  <h2> Capitulo 1.1 </h1> 
+  <h2> Capitulo 1.1 </h2> 
   <p> Lorem ipsum dolor sit amet. Est necessitatibus assumenda qui suscipit numquam aut ducimus fuga cum cupiditate provident. Non blanditiis laborum rem aspernatur dignissimos et voluptatum minus a illo voluptatem ut deserunt reiciendis sed fugiat veniam. Sed consequatur obcaecati et maxime iure qui corporis quia et provident accusamus ut ipsam pariatur. Est dolore perferendis eum neque blanditiis et corrupti laboriosam quo nobis cupiditate.</p> 
   <h2> Capitulo 1.2 </h2> 
   <p> Lorem ipsum dolor sit amet. Est necessitatibus assumenda qui suscipit numquam aut ducimus fuga cum cupiditate provident. Non blanditiis laborum rem aspernatur dignissimos et voluptatum minus a illo voluptatem ut deserunt reiciendis sed fugiat veniam. </p> 
