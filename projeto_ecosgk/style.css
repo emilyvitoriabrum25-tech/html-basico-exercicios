@@ -131,6 +131,7 @@ nav ul li a:hover {
     color: #8b008b;
 }
 /* Ultimas info*/
+
 .sobre-conteudo {
     display: flex;
     align-items: center; 
@@ -167,5 +168,4 @@ nav ul li a:hover {
 .sobre-texto li {
     margin-bottom: 10
 }
-/*Falta adcionar o rodapé da página*/ 
-/*Após assitir os módulos 2 e 3 de HTML5 e CC3, voltar aqui pra adicionar as interações me JS/* 
+/*vai ficar faltando o rodapé, dps vir aqui pra adicionar js*/
