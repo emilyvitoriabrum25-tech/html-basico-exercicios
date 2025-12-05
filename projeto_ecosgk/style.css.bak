@@ -169,27 +169,3 @@ nav ul li a:hover {
     margin-bottom: 10
 }
 /*vai ficar faltando o rodapé, dps vir aqui pra adicionar js*/
-
-footer {
-    background-color: #8b008b; /* Cor escura do logo para contraste */
-    color: #FFC0CB; /* Texto rosa claro */
-    text-align: center;
-    padding: 30px 20px;
-    font-size: 0.9em;
-}
-
-footer p {
-    margin: 0 0 10px 0; /* Espaço abaixo do parágrafo */
-}
-
-/* Estilo para a navegação opcional dentro do rodapé */
-.footer-nav a {
-    color: #FFD700; /* Links em dourado */
-    text-decoration: none;
-    margin: 0 10px;
-    transition: color 0.3s;
-}
-
-.footer-nav a:hover {
-    color: #ffffff; /* Fica branco no hover */
-}
