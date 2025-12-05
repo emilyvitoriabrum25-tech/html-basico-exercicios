@@ -1,0 +1,125 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #333; 
+    color: #FFFFFF; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+
+/* 2. LAYOUT PRINCIPAL DO APP (CARCAÇA DO CELULAR) */
+	max-width: 400px;
+	width: 100%;
+	height: 800px; 
+	background-color: #0D0D0D; 
+	border-radius: 25px; 
+	box-shadow: 0 0 40px rgba(0, 0, 0, 0.5); 
+	
+	/* Flexbox: Empilha o Header, Main e Footer verticalmente */
+	display: flex;
+	flex-direction: column;
+	overflow: hidden; 
+}
+
+
+.app-header {
+    background-color: #0D0D0D; 
+    padding: 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid #1A1A1A; 
+}
+
+.app-title {
+    margin: 0; 
+    font-size: 1.5em; 
+    color: #FF6A00; 
+    font-weight: 900; 
+    letter-spacing: 2px;
+}
+
+.btn-icon {
+    text-decoration: none;
+    color: #FFFFFF;
+    font-size: 1.2em;
+    padding: 5px; 
+}
+
+.app-content {
+    /* Ocupa o espaço vertical livre */
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto; 
+}
+
+.section-title {
+    font-size: 1em;
+    font-weight: 700;
+    color: #FF6A00;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+/* GRID DE CARDS: CRIA AS DUAS COLUNAS */
+.card-grid {
+    display: grid;
+    /* 1fr 1fr: Cria DUAS COLUNAS de tamanhos IGUAIS */
+    grid-template-columns: 1fr 1fr;
+    gap: 15px; /* Espaçamento entre os cards */
+}
+
+.treino-card {
+    /* Torna o link visualmente um bloco de card */
+    display: block; 
+    text-decoration: none; 
+    color: #FFFFFF; 
+    background-color: #1A1A1A; /* Fundo Grafite Escuro */
+    padding: 20px;
+    border-radius: 12px;
+    
+    /* Centraliza o conteúdo (A, B, C, Título) */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s; 
+}
+
+/* Efeito ao passar o mouse */
+.treino-card:hover {
+    transform: translateY(-3px); 
+    box-shadow: 0 5px 15px rgba(255, 106, 0, 0.2); 
+}
+
+.treino-card h3 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 1em;
+    font-weight: 700;
+}
+
+.treino-card p {
+    font-size: 0.7em;
+    color: #AAA;
+    margin: 0;
+}
+
+.card-icon {
+    /* O Círculo Laranja (A, B, C) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; 
+    background-color: #FF6A00; 
+    font-size: 1.2em;
+    font-weight: 900;
+    color: #0D0D0D; 
+    margin-bottom: 10px;
+}
